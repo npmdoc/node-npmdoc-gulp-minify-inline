@@ -1,0 +1,162 @@
+<html><head></head><body><div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a href="https://github.com/shkuznetsov/gulp-minify-inline">gulp-minify-inline (v0.2.1)</a>
+</h1>
+<h4>Gulp plugin to uglify inline JS and minify inline CSS</h4>
+<div class="apidocSectionDiv"><a href="#apidoc.tableOfContents" id="apidoc.tableOfContents"><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.gulp-minify-inline">module gulp-minify-inline</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.gulp-minify-inline.gulp-minify-inline">
+            function <span class="apidocSignatureSpan"></span>gulp-minify-inline
+            <span class="apidocSignatureSpan">( opt )</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.gulp-minify-inline" id="apidoc.module.gulp-minify-inline">module gulp-minify-inline</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.gulp-minify-inline.gulp-minify-inline" id="apidoc.element.gulp-minify-inline.gulp-minify-inline">
+        function <span class="apidocSignatureSpan"></span>gulp-minify-inline
+        <span class="apidocSignatureSpan">( opt )</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">gulp-minify-inline = function ( opt )
+{
+	opt = opt || {};
+
+	function minify ( file, encoding, callback )
+	{
+		if (file.isNull())
+		{
+			return callback(null, file);
+		}
+
+		if (file.isStream())
+		{
+			return callback(new gutil.PluginError('gulp-minify-inline', 'doesn\'t support Streams'));
+		}
+
+		var $ = cheerio.load(file.contents.toString(), {decodeEntities: false});
+
+		var has_done_nothing = true;
+
+		var jsSelector = opt.jsSelector || 'script';
+
+		if (opt.js !== false) $(jsSelector).each(function ( )
+		{
+			if (!opt.js) opt.js = {};
+			if (!opt.js.output) opt.js.output = {};
+
+			// Default js.output.inline_script to 'true'
+			if (typeof opt.js.output.inline_script == 'undefined') opt.js.output.inline_script = true;
+
+			opt.js.fromString = true;
+
+			var $this = $(this),
+				script_orig = $this.text().trim();
+
+			if (script_orig !== '')
+			{
+				var script_min = uglifyjs.minify(script_orig, opt.js);
+
+				$this.text(script_min.code);
+
+				has_done_nothing = false;
+			}
+		});
+
+		var cssSelector = opt.cssSelector || 'style';
+
+		if (opt.css !== false) $(cssSelector).each(function ( )
+		{
+			var $this = $(this),
+				style_orig = $this.text().trim();
+
+			if (style_orig !== '')
+			{
+				var style_min = new cleancss(opt.css).minify(style_orig).styles;
+
+				$this.text(style_min);
+
+				has_done_nothing = false;
+			}
+		});
+
+		if (!has_done_nothing) file.contents = new Buffer($.html());
+
+		callback(null, file);
+	}
+
+	return through.obj(minify);
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
+</body></html>
